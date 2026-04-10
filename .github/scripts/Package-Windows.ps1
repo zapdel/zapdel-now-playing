@@ -68,19 +68,15 @@ function Package {
     Compress-Archive -Force @CompressArgs
     Log-Group
 	
-	Log-Group "Building installer for ${ProductName}..."
-	$CPackArgs = @{
-		FilePath = 'cmake'
-		ArgumentList = @(
-			'--build', "build_x64",
-			'--config', $Configuration,
-			'--target', 'package'
-		)
-		NoNewWindow = $true
-		Wait = $true
-	}
-	Start-Process @CPackArgs
-	Log-Group
+    Log-Group "Building installer for ${ProductName}..."
+    Push-Location "${ProjectRoot}/build_${Target}"
+    Invoke-External cpack -C $Configuration
+    $Installer = Get-ChildItem -Path . -Filter '*.exe' | Select-Object -First 1
+    if ($Installer) {
+        Copy-Item $Installer.FullName "${ProjectRoot}/release/${OutputName}.exe"
+    }
+    Pop-Location
+    Log-Group
 }
 
 Package
