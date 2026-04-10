@@ -67,6 +67,20 @@ function Package {
     }
     Compress-Archive -Force @CompressArgs
     Log-Group
+	
+	Log-Group "Building installer for ${ProductName}..."
+	$CPackArgs = @{
+		FilePath = 'cmake'
+		ArgumentList = @(
+			'--build', "build_x64",
+			'--config', $Configuration,
+			'--target', 'package'
+		)
+		NoNewWindow = $true
+		Wait = $true
+	}
+	Start-Process @CPackArgs
+	Log-Group
 }
 
 Package

@@ -110,7 +110,7 @@ themes/
 ## Building from Source
 
 ```bash
-git clone --recursive https://github.com/<your-username>/zapdel-now-playing.git
+git clone --recursive https://github.com/zapdel/zapdel-now-playing.git
 cd zapdel-now-playing
 cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build --config RelWithDebInfo
