@@ -1,0 +1,267 @@
+/* ==========================================================================
+   Now Playing — Compact Theme
+   Full-bleed album art with a gradient overlay at the bottom for metadata.
+   All colour / typography customisation lives in the :root block below.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Custom properties — primary customisation surface
+   -------------------------------------------------------------------------- */
+:root {
+    /* Canvas size (injected by the plugin; do not remove these defaults) */
+    --np-width:  400px;
+    --np-height: 400px;
+
+    /* Card */
+    --np-border-radius: 14px;
+    --np-border:        0px none rgba(255, 255, 255, 0.18);
+
+    /* Fallback background — visible when album art is hidden */
+    --np-bg: rgba(15, 15, 20, 0.95);
+
+    /* Album art placeholder */
+    --np-art-placeholder-bg:    rgba(255, 255, 255, 0.06);
+    --np-art-placeholder-color: rgba(255, 255, 255, 0.25);
+    --np-art-placeholder-size:  3rem;
+
+    /* Pause overlay */
+    --np-pause-overlay-bg:    rgba(20, 20, 20, 0.65);
+    --np-pause-overlay-color: rgba(255, 255, 255, 0.9);
+
+    /* Gradient overlay — covers the bottom of the art */
+    --np-gradient-height: 200px;
+    --np-gradient:        linear-gradient(
+                              to bottom,
+                              transparent 0%,
+                              rgba(8, 8, 12, 0.8) 35%,
+                              rgba(8, 8, 12, 0.92) 100%
+                          );
+
+    /* Text */
+    --np-font:         'Segoe UI', system-ui, sans-serif;
+    --np-title-color:  #ffffff;
+    --np-title-size:   2rem;
+    --np-title-weight: 600;
+    --np-meta-color:   rgba(255, 255, 255, 0.7);
+    --np-meta-size:    1.4rem;
+
+    /* Inner text padding (left/right only — progress bar goes full width) */
+    --np-text-padding: 0 13px;
+
+    /* Progress bar */
+    --np-progress-height: 4px;
+    --np-progress-track:  rgba(255, 255, 255, 0.12);
+    --np-progress-fill:   #1db954;
+    --np-progress-radius: 0px;   /* flush to edges — no rounding on the bar */
+
+    /* Animation */
+    --np-anim-in-duration:  0.45s;
+    --np-anim-in-easing:    cubic-bezier(0.22, 1, 0.36, 1);
+    --np-anim-out-duration: 0.35s;
+    --np-anim-out-easing:   cubic-bezier(0.5, 0, 0.75, 0);
+
+    /* Marquee */
+    --np-marquee-speed: 18s;
+    --np-marquee-gap:   60px;
+}
+
+/* --------------------------------------------------------------------------
+   Reset & base
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width:      var(--np-width);
+    height:     var(--np-height);
+    overflow:   hidden;
+    background: transparent;
+    font-family: var(--np-font);
+}
+
+/* --------------------------------------------------------------------------
+   Container — art fills the whole card; info floats over the bottom
+   -------------------------------------------------------------------------- */
+#np-container {
+    position:      relative;
+    width:         var(--np-width);
+    height:        var(--np-height);
+    background:    var(--np-bg);
+    border-radius: var(--np-border-radius);
+    border:        var(--np-border);
+    overflow:      hidden;
+
+    /* Start off-screen below the canvas */
+    transform: translateY(110%);
+}
+
+/* --------------------------------------------------------------------------
+   Slide-in / slide-out animations
+   -------------------------------------------------------------------------- */
+@keyframes np-slide-in {
+    from { transform: translateY(110%); }
+    to   { transform: translateY(0); }
+}
+
+@keyframes np-slide-out {
+    from { transform: translateY(0); }
+    to   { transform: translateY(110%); }
+}
+
+#np-container.np-showing {
+    animation: np-slide-in var(--np-anim-in-duration) var(--np-anim-in-easing) forwards;
+}
+
+#np-container.np-hiding {
+    animation: np-slide-out var(--np-anim-out-duration) var(--np-anim-out-easing) forwards;
+}
+
+#np-container.np-hidden {
+    transform: translateY(110%);
+    animation: none;
+}
+
+/* --------------------------------------------------------------------------
+   Album art — full-bleed, fills the entire card
+   -------------------------------------------------------------------------- */
+#np-art-wrap {
+    position: absolute;
+    inset:    0;
+}
+
+#np-art {
+    width:           100%;
+    height:          100%;
+    object-fit:      cover;
+    object-position: center center;
+    display:         block;
+}
+
+#np-art-placeholder {
+    width:            100%;
+    height:           100%;
+    background:       var(--np-art-placeholder-bg);
+    color:            var(--np-art-placeholder-color);
+    font-size:        var(--np-art-placeholder-size);
+    display:          flex;
+    align-items:      center;
+    justify-content:  center;
+}
+
+/* Pause overlay — covers the full card */
+#np-pause-overlay {
+    position:        absolute;
+    inset:           0;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    pointer-events:  none;
+    opacity:         0;
+    transition:      opacity 0.2s ease;
+}
+
+#np-pause-overlay.np-paused {
+    opacity: 1;
+}
+
+#np-pause-overlay span {
+    width:           64px;
+    height:          64px;
+    border-radius:   50%;
+    background:      var(--np-pause-overlay-bg);
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    gap:             10px;
+}
+
+#np-pause-overlay span::before,
+#np-pause-overlay span::after {
+    content:       '';
+    width:         9px;
+    height:        25px;
+    background:    var(--np-pause-overlay-color);
+    border-radius: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Info overlay — gradient strip anchored to the bottom of the card
+   -------------------------------------------------------------------------- */
+#np-info {
+    position:       absolute;
+    bottom:         0;
+    left:           0;
+    right:          0;
+    height:         var(--np-gradient-height);
+    background:     var(--np-gradient);
+
+    display:        flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap:            4px;
+
+    /* No left/right padding here — applied per child so progress goes edge-to-edge */
+    padding-top:    16px;
+}
+
+/* Title row */
+#np-title-wrap {
+    overflow:    hidden;
+    white-space: nowrap;
+    position:    relative;
+    padding:     var(--np-text-padding);
+}
+
+#np-title {
+    display:     inline-block;
+    white-space: nowrap;
+    color:       var(--np-title-color);
+    font-size:   var(--np-title-size);
+    font-weight: var(--np-title-weight);
+}
+
+#np-title.np-marquee {
+    animation: np-marquee var(--np-marquee-speed) linear infinite;
+}
+
+@keyframes np-marquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(var(--np-marquee-offset, -50%)); }
+}
+
+/* Artist / Album row */
+#np-meta {
+    color:         var(--np-meta-color);
+    font-size:     var(--np-meta-size);
+    overflow:      hidden;
+    white-space:   nowrap;
+    text-overflow: ellipsis;
+    padding:       var(--np-text-padding);
+    margin-bottom: 6px;
+}
+
+#np-sep {
+    margin: 0 4px;
+}
+
+/* --------------------------------------------------------------------------
+   Progress bar — full width, flush to the bottom edge of the card
+   -------------------------------------------------------------------------- */
+#np-progress-wrap {
+    height:        var(--np-progress-height);
+    background:    var(--np-progress-track);
+    border-radius: var(--np-progress-radius);
+    overflow:      hidden;
+    flex-shrink:   0;
+}
+
+#np-progress-bar {
+    height:        100%;
+    width:         0%;
+    background:    var(--np-progress-fill);
+    border-radius: var(--np-progress-radius);
+    transition:    width 1s linear;
+}

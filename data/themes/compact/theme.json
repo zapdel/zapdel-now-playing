@@ -1,0 +1,9 @@
+{
+    "name": "Compact",
+    "author": "zapdel",
+    "version": "1.0.0",
+    "description": "Full-bleed album art with gradient metadata overlay. Default size: 400x400.",
+    "minPluginVersion": "1.0.0",
+    "defaultWidth": 400,
+    "defaultHeight": 400
+}

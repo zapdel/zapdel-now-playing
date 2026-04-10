@@ -1,0 +1,9 @@
+{
+    "name": "Default",
+    "author": "zapdel",
+    "version": "1.0.0",
+    "description": "The default theme. Also a reference for theme creators.",
+    "minPluginVersion": "1.0.0",
+    "defaultWidth": 800,
+    "defaultHeight": 120
+}

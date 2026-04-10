@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Now Playing</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="np-container" class="np-hidden">
+
+    <div id="np-art-wrap">
+        <img id="np-art" alt="">
+        <div id="np-art-placeholder">&#9835;</div>
+        <div id="np-pause-overlay"><span></span></div>
+    </div>
+
+    <div id="np-info">
+
+        <div id="np-title-wrap">
+            <span id="np-title"></span>
+        </div>
+
+        <div id="np-meta">
+            <span id="np-artist"></span>
+            <span id="np-sep" class="np-sep">&#8212;</span>
+            <span id="np-album"></span>
+        </div>
+
+        <div id="np-progress-wrap">
+            <div id="np-progress-bar"></div>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="../np-core.js"></script>
+<script src="theme.js"></script>
+
+</body>
+</html>

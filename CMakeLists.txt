@@ -13,6 +13,9 @@ include(helpers)
 
 add_library(${CMAKE_PROJECT_NAME} MODULE)
 
+# C++20 required for WinRT / cppwinrt
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON)
+
 find_package(libobs REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
 
@@ -34,6 +37,28 @@ if(ENABLE_QT)
   )
 endif()
 
-target_sources(${CMAKE_PROJECT_NAME} PRIVATE src/plugin-main.c)
+target_sources(
+  ${CMAKE_PROJECT_NAME}
+  PRIVATE
+    src/plugin-main.cpp
+    src/now-playing-source.cpp
+    src/smtc-reader.cpp
+    src/browser-bridge.cpp
+)
+
+if(WIN32)
+  # WinRT: required for SMTC (System Media Transport Controls)
+  target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE WindowsApp)
+
+  # obs-browser headers: look in the OBS source fetched by buildspec
+  file(GLOB _obs_studio_source_dirs "${CMAKE_CURRENT_SOURCE_DIR}/.deps/obs-studio-*")
+  foreach(_dir IN LISTS _obs_studio_source_dirs)
+    if(EXISTS "${_dir}/plugins/obs-browser/obs-browser-api.h")
+      target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "${_dir}/plugins/obs-browser")
+      message(STATUS "Found obs-browser headers: ${_dir}/plugins/obs-browser")
+      break()
+    endif()
+  endforeach()
+endif()
 
 set_target_properties_plugin(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME ${_name})

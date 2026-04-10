@@ -1,0 +1,9 @@
+{
+    "name": "Art Top",
+    "author": "zapdel",
+    "version": "1.0.0",
+    "description": "Square album art above a compact info strip. Default size: 400x500.",
+    "minPluginVersion": "1.0.0",
+    "defaultWidth": 400,
+    "defaultHeight": 500
+}

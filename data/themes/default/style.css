@@ -1,0 +1,256 @@
+/* ==========================================================================
+   Now Playing — Default Theme
+   All colour / typography customisation lives in the :root block below.
+   Layout, animation, and behaviour are defined further down.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Custom properties — primary customisation surface
+   -------------------------------------------------------------------------- */
+:root {
+    /* Canvas size (injected by the plugin; do not remove these defaults) */
+    --np-width:  800px;
+    --np-height: 120px;
+
+    /* Background */
+    --np-bg:             rgba(15, 15, 20, 0.88);
+    --np-border-radius:  8px;
+
+    /* Album art placeholder */
+    --np-art-placeholder-bg:    rgba(255, 255, 255, 0.08);
+    --np-art-placeholder-color: rgba(255, 255, 255, 0.3);
+    --np-art-placeholder-size:  1.8rem;
+
+    /* Pause overlay (shown over album art when paused) */
+    --np-pause-overlay-bg:    rgba(30, 30, 30, 0.6);
+    --np-pause-overlay-color: rgba(255, 255, 255, 0.85);
+
+    /* Text */
+    --np-font:        'Segoe UI', system-ui, sans-serif;
+    --np-title-color: #ffffff;
+    --np-title-size:  1.05rem;
+    --np-title-weight: 600;
+    --np-meta-color:  rgba(255, 255, 255, 0.65);
+    --np-meta-size:   0.8rem;
+
+    /* Progress bar */
+    --np-progress-height:  3px;
+    --np-progress-track:   rgba(255, 255, 255, 0.15);
+    --np-progress-fill:    #1db954; /* Spotify green by default */
+    --np-progress-radius:  2px;
+
+    /* Inner spacing */
+    --np-padding:     10px 14px;
+    --np-art-size:    calc(var(--np-height) - 20px);
+    --np-art-gap:     12px;
+
+    /* Animation */
+    --np-anim-in-duration:  0.45s;
+    --np-anim-in-easing:    cubic-bezier(0.22, 1, 0.36, 1);
+    --np-anim-out-duration: 0.35s;
+    --np-anim-out-easing:   cubic-bezier(0.5, 0, 0.75, 0);
+
+    /* Marquee */
+    --np-marquee-speed: 18s;
+    --np-marquee-gap:   60px;  /* space between end and restart of title */
+}
+
+/* --------------------------------------------------------------------------
+   Reset & base
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width:      var(--np-width);
+    height:     var(--np-height);
+    overflow:   hidden;
+    background: transparent;
+    font-family: var(--np-font);
+}
+
+/* --------------------------------------------------------------------------
+   Container
+   -------------------------------------------------------------------------- */
+#np-container {
+    width:         var(--np-width);
+    height:        var(--np-height);
+    background:    var(--np-bg);
+    border-radius: var(--np-border-radius);
+    display:       flex;
+    align-items:   center;
+    padding:       var(--np-padding);
+    gap:           var(--np-art-gap);
+    overflow:      hidden;
+
+    /* Start off-screen below the canvas */
+    transform: translateY(110%);
+}
+
+/* --------------------------------------------------------------------------
+   Slide-in / slide-out animations
+   -------------------------------------------------------------------------- */
+@keyframes np-slide-in {
+    from { transform: translateY(110%); }
+    to   { transform: translateY(0); }
+}
+
+@keyframes np-slide-out {
+    from { transform: translateY(0); }
+    to   { transform: translateY(110%); }
+}
+
+#np-container.np-showing {
+    animation: np-slide-in var(--np-anim-in-duration) var(--np-anim-in-easing) forwards;
+}
+
+#np-container.np-hiding {
+    animation: np-slide-out var(--np-anim-out-duration) var(--np-anim-out-easing) forwards;
+}
+
+/* Hidden state: keep transform so there's no flash on load */
+#np-container.np-hidden {
+    transform: translateY(110%);
+    animation: none;
+}
+
+/* --------------------------------------------------------------------------
+   Album art
+   -------------------------------------------------------------------------- */
+#np-art-wrap {
+    flex-shrink: 0;
+    width:       var(--np-art-size);
+    height:      var(--np-art-size);
+    position:    relative;
+    border-radius: 4px;
+    overflow:    hidden;
+}
+
+#np-art {
+    width:      100%;
+    height:     100%;
+    object-fit: cover;
+    display:    block;
+}
+
+#np-art-placeholder {
+    width:            100%;
+    height:           100%;
+    background:       var(--np-art-placeholder-bg);
+    color:            var(--np-art-placeholder-color);
+    font-size:        var(--np-art-placeholder-size);
+    display:          flex;
+    align-items:      center;
+    justify-content:  center;
+}
+
+/* Pause overlay — centered circle with two-bar icon, fades in/out */
+#np-pause-overlay {
+    position:        absolute;
+    inset:           0;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    pointer-events:  none;
+    opacity:         0;
+    transition:      opacity 0.2s ease;
+}
+
+#np-pause-overlay.np-paused {
+    opacity: 1;
+}
+
+/* The circle */
+#np-pause-overlay span {
+    width:           44%;
+    aspect-ratio:    1;
+    border-radius:   50%;
+    background:      var(--np-pause-overlay-bg);
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    gap:             16%;
+}
+
+/* The two bars of the pause icon */
+#np-pause-overlay span::before,
+#np-pause-overlay span::after {
+    content:       '';
+    width:         14%;
+    height:        38%;
+    background:    var(--np-pause-overlay-color);
+    border-radius: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Track info
+   -------------------------------------------------------------------------- */
+#np-info {
+    flex:     1;
+    min-width: 0;         /* allow flex child to shrink below content size */
+    display:  flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    overflow: hidden;
+}
+
+/* Title row — marquee container */
+#np-title-wrap {
+    overflow:    hidden;
+    white-space: nowrap;
+    position:    relative;
+}
+
+#np-title {
+    display:     inline-block;
+    white-space: nowrap;
+    color:       var(--np-title-color);
+    font-size:   var(--np-title-size);
+    font-weight: var(--np-title-weight);
+}
+
+/* CSS marquee — activated by JS adding this class when text overflows */
+#np-title.np-marquee {
+    animation: np-marquee var(--np-marquee-speed) linear infinite;
+}
+
+@keyframes np-marquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(var(--np-marquee-offset, -50%)); }
+}
+
+/* Artist / Album row */
+#np-meta {
+    color:     var(--np-meta-color);
+    font-size: var(--np-meta-size);
+    overflow:  hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#np-sep {
+    margin: 0 4px;
+}
+
+/* --------------------------------------------------------------------------
+   Progress bar
+   -------------------------------------------------------------------------- */
+#np-progress-wrap {
+    height:        var(--np-progress-height);
+    background:    var(--np-progress-track);
+    border-radius: var(--np-progress-radius);
+    overflow:      hidden;
+    margin-top:    2px;
+}
+
+#np-progress-bar {
+    height:        100%;
+    width:         0%;
+    background:    var(--np-progress-fill);
+    border-radius: var(--np-progress-radius);
+    transition:    width 1s linear;
+}
