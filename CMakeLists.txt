@@ -62,3 +62,19 @@ if(WIN32)
 endif()
 
 set_target_properties_plugin(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME ${_name})
+
+if(WIN32)
+  set(CPACK_GENERATOR "NSIS")
+  set(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
+  set(CPACK_PACKAGE_VERSION "${CMAKE_PROJECT_VERSION}")
+  set(CPACK_PACKAGE_VENDOR "zapdel")
+  # $INSTDIR = CPACK_NSIS_INSTALL_ROOT\CPACK_PACKAGE_INSTALL_DIRECTORY
+  # Install rules place files under zapdel-now-playing/bin/64bit/ and zapdel-now-playing/data/
+  # so $INSTDIR must resolve to %ProgramData%\obs-studio\plugins
+  set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMDATA\\obs-studio")
+  set(CPACK_PACKAGE_INSTALL_DIRECTORY "plugins")
+  set(CPACK_NSIS_DISPLAY_NAME "Now Playing OBS Plugin")
+  set(CPACK_NSIS_PACKAGE_NAME "Now Playing OBS Plugin ${CMAKE_PROJECT_VERSION}")
+  set(CPACK_NSIS_UNINSTALL_NAME "Uninstall Now Playing OBS Plugin")
+  include(CPack)
+endif()
